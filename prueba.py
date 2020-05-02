@@ -41,15 +41,30 @@ def juego(nplayers, pretty_print = False):
         Card.print_pretty_cards(board) # imprime tablero
         evaluator.hand_summary(board, hands) # imprime ganador
 
-    # Se calcula el ranking de cada mano.
+    # Se calcula el ranking de cadfloat64a mano.
     ranking = [evaluator.evaluate(hand, board) for hand in hands]
     return([initial_rank, ranking])
 
 nplayers = 9
-simulaciones = 10
+simulaciones = 10000
 
-#resultados = [juego(nplayers) for _ in range(simulaciones)]
+# No multiprocessing
+# 9 jugadores, 10 simulaciones tardan 0.00508 seg.
+# 9 jugadores, 100 simulaciones tardan 0.05172 seg.
+# 9 jugadores, 1000 simulaciones tardan 0.45957 seg.
+# 9 jugadores, 10000 simulaciones tardan 4.6288 seg.
+
+t1 = time.time()
+resultados = [juego(nplayers) for _ in range(simulaciones)]
+print(time.time()- t1)
+
+# multiprocessing
+# 9 jugadores, 10 simulaciones tardan 0.01067 seg.
+# 9 jugadores, 100 simulaciones tardan 0.06975 seg.
+# 9 jugadores, 1000 simulaciones tardan 0.73980 seg.
+# 9 jugadores, 10000 simulaciones tardan 7.5221 seg.
+t1 = time.time()
 resultados = thread_pool.map(juego, np.ones(simulaciones,dtype=int)*nplayers)
-
+print(time.time()-t1)
 
 print(resultados)
