@@ -11,6 +11,9 @@ Created on Fri May  1 18:38:03 2020
 # Falta incorporar imports relativos y sacar el documento de la carpeta.
 # https://realpython.com/absolute-vs-relative-python-imports/
 import time
+from multiprocessing import pool, cpu_count
+
+import numpy as np
 
 from deck import Deck
 from card import Card
@@ -19,7 +22,7 @@ from init_rank import init_rank
 
 initial_ranking = init_rank.initial_ranking
 evaluator = Evaluator()
-
+thread_pool = pool.ThreadPool(cpu_count())
 
 def juego(nplayers, pretty_print = False):
     deck = Deck()
@@ -43,6 +46,10 @@ def juego(nplayers, pretty_print = False):
     return([initial_rank, ranking])
 
 nplayers = 9
-simulaciones = 1
-resultados = [juego(nplayers) for _ in range(simulaciones)]
+simulaciones = 10
+
+#resultados = [juego(nplayers) for _ in range(simulaciones)]
+resultados = thread_pool.map(juego, np.ones(simulaciones,dtype=int)*nplayers)
+
+
 print(resultados)
