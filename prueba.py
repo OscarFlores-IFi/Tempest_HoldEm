@@ -46,8 +46,8 @@ def juego(nplayers, pretty_print = False):
 
 save_file = "simulaciones.json" # si no se desea guardar, dejar str vacío.
 nplayers = 9
-simulaciones = 2
-imprimir_simulaciones = True
+simulaciones = 500000
+imprimir_simulaciones = False
 
 t1 = time.time()
 resultados = [juego(nplayers, imprimir_simulaciones) for _ in range(simulaciones)]
