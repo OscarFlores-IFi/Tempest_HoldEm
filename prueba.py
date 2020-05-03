@@ -46,8 +46,8 @@ def juego(nplayers, pretty_print = False):
 
 save_file = "simulaciones.json" # si no se desea guardar, dejar str vacío.
 nplayers = 9
-simulaciones = 10000
-imprimir_simulaciones = False
+simulaciones = 2
+imprimir_simulaciones = True
 
 t1 = time.time()
 resultados = [juego(nplayers, imprimir_simulaciones) for _ in range(simulaciones)]
@@ -56,5 +56,14 @@ print(time.time()-t1)
 if save_file:
     with open(save_file, "w") as write_file:
         json.dump(resultados, write_file)
+
+""" Para posteriormente cargar los datos guardados en el archivo .json
+try:
+    with open('simulaciones.json',) as f:
+        distros_dict = json.load(f)
+    print(distros_dict)
+except:
+    pass
+"""
 
 print(resultados)
