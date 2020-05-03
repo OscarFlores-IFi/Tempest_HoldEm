@@ -11,6 +11,7 @@ Created on Fri May  1 18:38:03 2020
 # Falta incorporar imports relativos y sacar el documento de la carpeta.
 # https://realpython.com/absolute-vs-relative-python-imports/
 import time
+import json
 
 import numpy as np
 
@@ -18,15 +19,10 @@ from deck import Deck
 from card import Card
 from evaluator import Evaluator
 from init_rank import init_rank
-import ray
-
-
-ray.init()
 
 initial_ranking = init_rank.initial_ranking
 evaluator = Evaluator()
 
-@ray.remote
 def juego(nplayers, pretty_print = False):
     deck = Deck()
     # Repartimos 2 cartas a cada jugador
@@ -48,15 +44,17 @@ def juego(nplayers, pretty_print = False):
     ranking = [evaluator.evaluate(hand, board) for hand in hands]
     return([initial_rank, ranking])
 
+save_file = "simulaciones.json" # si no se desea guardar, dejar str vacío.
 nplayers = 9
 simulaciones = 10000
-# Linear processing - 9 jugadores, 10000 simulaciones tardan 7.4660 seg.
-# Multiprocessing   - 9 jugadores, 10000 simulaciones tardan 9.9984 seg.
-# ray processing    - 9 jugadores, 10000 simulaciones tardan 27.761 seg.
+imprimir_simulaciones = False
 
 t1 = time.time()
-resultados = ray.get([juego.remote(nplayers) for _ in range(simulaciones)])
+resultados = [juego(nplayers, imprimir_simulaciones) for _ in range(simulaciones)]
 print(time.time()-t1)
 
+if save_file:
+    with open(save_file, "w") as write_file:
+        json.dump(resultados, write_file)
 
 print(resultados)
