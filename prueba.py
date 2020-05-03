@@ -28,7 +28,8 @@ def juego(nplayers, pretty_print = False):
     # Repartimos 2 cartas a cada jugador
     hands = [deck.draw(2) for _ in range(nplayers)]
 
-    # Cada jugador decide si apuesta o no apuesta en base a su posici�n y su mano inicial.
+    # Cada ju
+    s decide si apuesta o no apuesta en base a su posici�n y su mano inicial.
     initial_rank = [initial_ranking(hand) for hand in hands] # ranking inicial p/2 jugadores, seg�n Michael Shackleford.
 
     # Se reparte las 5 cartas comunes.
