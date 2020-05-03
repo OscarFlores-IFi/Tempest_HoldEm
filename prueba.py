@@ -11,7 +11,6 @@ Created on Fri May  1 18:38:03 2020
 # Falta incorporar imports relativos y sacar el documento de la carpeta.
 # https://realpython.com/absolute-vs-relative-python-imports/
 import time
-from multiprocessing import pool, cpu_count
 
 import numpy as np
 
@@ -19,11 +18,15 @@ from deck import Deck
 from card import Card
 from evaluator import Evaluator
 from init_rank import init_rank
+import ray
+
+
+ray.init()
 
 initial_ranking = init_rank.initial_ranking
 evaluator = Evaluator()
-thread_pool = pool.ThreadPool(cpu_count())
 
+@ray.remote
 def juego(nplayers, pretty_print = False):
     deck = Deck()
     # Repartimos 2 cartas a cada jugador
@@ -47,24 +50,13 @@ def juego(nplayers, pretty_print = False):
 
 nplayers = 9
 simulaciones = 10000
-
-# No multiprocessing
-# 9 jugadores, 10 simulaciones tardan 0.00508 seg.
-# 9 jugadores, 100 simulaciones tardan 0.05172 seg.
-# 9 jugadores, 1000 simulaciones tardan 0.45957 seg.
-# 9 jugadores, 10000 simulaciones tardan 4.6288 seg.
+# Linear processing - 9 jugadores, 10000 simulaciones tardan 7.4660 seg.
+# Multiprocessing   - 9 jugadores, 10000 simulaciones tardan 9.9984 seg.
+# ray processing    - 9 jugadores, 10000 simulaciones tardan 27.761 seg.
 
 t1 = time.time()
-resultados = [juego(nplayers) for _ in range(simulaciones)]
-print(time.time()- t1)
-
-# multiprocessing
-# 9 jugadores, 10 simulaciones tardan 0.01067 seg.
-# 9 jugadores, 100 simulaciones tardan 0.06975 seg.
-# 9 jugadores, 1000 simulaciones tardan 0.73980 seg.
-# 9 jugadores, 10000 simulaciones tardan 7.5221 seg.
-t1 = time.time()
-resultados = thread_pool.map(juego, np.ones(simulaciones,dtype=int)*nplayers)
+resultados = ray.get([juego.remote(nplayers) for _ in range(simulaciones)])
 print(time.time()-t1)
+
 
 print(resultados)
