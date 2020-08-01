@@ -13,12 +13,16 @@ The project starts by simulating different scenarios and finding out what
 hands are the most powerfull ones.  
 """
 
+
 import time
 import json
 
+from numba import jit
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import datashader as ds, pandas as pd
+import datashader.transfer_functions as tf
 
 from holdem.deck import Deck
 from holdem.card import Card
@@ -28,6 +32,7 @@ from init_rank import init_rank
 initial_ranking = init_rank.initial_ranking
 evaluator = Evaluator()
 
+@jit(nopython=True)
 def game(nplayers, pretty_print = False):
     """
     
@@ -68,6 +73,7 @@ def game(nplayers, pretty_print = False):
     ranking = [evaluator.evaluate(hand, board) for hand in hands]
     return([initial_rank, ranking])
 
+@jit(nopython=True)
 def simulate_games(nplayers, simulations, print_simulations = False, save_file = ""):
     """
     
@@ -158,11 +164,15 @@ def linear(results):
     
     return mat
 
+# #%%
+# game(9, True)
 
+# #%%
+# simulate_games(9, 10, True)
 
-
+#%%
 nplayers = 9
-simulations = 10000
+simulations = 50000000
 filename = "simulations.json"
 
 # results = simulate_games(nplayers, simulations, save_file=filename) # for overwriting the file
@@ -174,11 +184,9 @@ lin = linear(results)
 # fig = plt.figure()
 # pd.value_counts(lin0[:,0], sort = False).plot.bar()
 # fig.show()
+df = pd.DataFrame(lin,columns = ['x', 'y'])
 
-
-heatmap, xedges, yedges = np.histogram2d(lin[:,0], lin[:,1], bins=50)
-extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-
-plt.clf()
-plt.imshow(heatmap.T, extent=extent, origin='lower')
-plt.show()
+cvs = ds.Canvas(plot_width=800, plot_height=400)
+agg = cvs.points(df, 'x', 'y')
+img = tf.shade(agg, cmap=['lightblue', 'darkblue'], how='log')
+ds.transfer_functions.Image.border=0
