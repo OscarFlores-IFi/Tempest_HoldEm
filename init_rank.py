@@ -5,9 +5,13 @@ Created on Fri May  1 17:31:25 2020
 
 @author: of
 
+Ranking of different received hands in Tempest hold'em. It represents every
+single paired combination, 13 the ace, 12 the king, 11 the queen, ...
+onto the 2 which is the deuce.  
+
 """
 
-from card import Card
+from holdem.card import Card
 
 class init_rank():
     suited = { 
