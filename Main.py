@@ -190,8 +190,8 @@ def linear(results):
 
 
 t1 = time.time()
-nplayers = 9
-simulations = 1000
+nplayers = 6
+simulations = 10000000
 filename = "simulations.json"
 
 
@@ -203,10 +203,10 @@ local_rankings = local_ranking(results)
 lin = linear(local_rankings)
 img = heatmap_datashader(lin)
 
-
-centroids = np.zeros(169,)
+# Calculation of the expected value (returns)
+EV = np.zeros(169,)
 for i in range(1,170):
-    centroids[i-1] = np.mean(lin[lin[:,0]==i][:,1])
+    EV[i-1] =  np.sum(lin[lin[:,0]==i][:,1] == 0)/len(lin[lin[:,0]==i][:,1] == 0)*len(results[0][0])
 
-plt.plot(centroids)
-arg = np.argsort(centroids)+1
+plt.plot(EV)
+
