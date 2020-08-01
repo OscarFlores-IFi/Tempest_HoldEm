@@ -28,11 +28,11 @@ from holdem.deck import Deck
 from holdem.card import Card
 from holdem.evaluator import Evaluator
 from init_rank import init_rank
+from visualizations import heatmap_datashader
 
 initial_ranking = init_rank.initial_ranking
 evaluator = Evaluator()
 
-@jit(nopython=True)
 def game(nplayers, pretty_print = False):
     """
     
@@ -73,7 +73,7 @@ def game(nplayers, pretty_print = False):
     ranking = [evaluator.evaluate(hand, board) for hand in hands]
     return([initial_rank, ranking])
 
-@jit(nopython=True)
+
 def simulate_games(nplayers, simulations, print_simulations = False, save_file = ""):
     """
     
@@ -107,6 +107,7 @@ def simulate_games(nplayers, simulations, print_simulations = False, save_file =
             
     return results
 
+
 def load_sim_json(filename, print_json = False):
     """
     
@@ -136,6 +137,7 @@ def load_sim_json(filename, print_json = False):
     
     print('no file with the specified name')
 
+
 def linear(results):
     """
     
@@ -164,29 +166,22 @@ def linear(results):
     
     return mat
 
-# #%%
-# game(9, True)
 
-# #%%
-# simulate_games(9, 10, True)
-
-#%%
+t1 = time.time()
 nplayers = 9
-simulations = 50000000
+simulations = 1000
 filename = "simulations.json"
 
-# results = simulate_games(nplayers, simulations, save_file=filename) # for overwriting the file
+
+# results = simulate_games(nplayers, simulations) #, save_file=filename) # for overwriting the file
 results = load_sim_json("simulations.json") # for loading the file
-
 lin = linear(results)
+img = heatmap_datashader(lin)
 
-# lin0 = lin[np.argsort(lin[:,0])]
-# fig = plt.figure()
-# pd.value_counts(lin0[:,0], sort = False).plot.bar()
-# fig.show()
-df = pd.DataFrame(lin,columns = ['x', 'y'])
 
-cvs = ds.Canvas(plot_width=800, plot_height=400)
-agg = cvs.points(df, 'x', 'y')
-img = tf.shade(agg, cmap=['lightblue', 'darkblue'], how='log')
-ds.transfer_functions.Image.border=0
+centroids = np.zeros(169,)
+for i in range(1,170):
+    centroids[i-1] = np.mean(lin[lin[:,0]==i][:,1])
+
+plt.plot(centroids)
+arg = np.argsort(centroids)+1
