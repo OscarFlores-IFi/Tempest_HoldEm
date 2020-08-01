@@ -17,6 +17,8 @@ import time
 import json
 
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 from holdem.deck import Deck
 from holdem.card import Card
@@ -160,13 +162,23 @@ def linear(results):
 
 
 nplayers = 9
-simulations = 10
+simulations = 10000
 filename = "simulations.json"
 
-# results = simulate_games(9, 10, save_file=filename)
-results = load_sim_json("simulations.json")
+# results = simulate_games(nplayers, simulations, save_file=filename) # for overwriting the file
+results = load_sim_json("simulations.json") # for loading the file
+
+lin = linear(results)
+
+# lin0 = lin[np.argsort(lin[:,0])]
+# fig = plt.figure()
+# pd.value_counts(lin0[:,0], sort = False).plot.bar()
+# fig.show()
 
 
+heatmap, xedges, yedges = np.histogram2d(lin[:,0], lin[:,1], bins=50)
+extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
 
-
-    
+plt.clf()
+plt.imshow(heatmap.T, extent=extent, origin='lower')
+plt.show()
