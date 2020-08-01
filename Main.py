@@ -138,6 +138,28 @@ def load_sim_json(filename, print_json = False):
     print('no file with the specified name')
 
 
+def local_ranking(results):
+    """
+    
+
+    Parameters
+    ----------
+    results : list
+        Dataset with initial hand ranking and the global hand ranking.
+
+    Returns
+    -------
+    results : list
+        Dataset with the initial hand ranking and the game-local hand ranking
+        (from 0 - nplayers).
+
+    """
+    for i in range(len(results)): 
+        results[i][1] = np.argsort(results[i][1])
+    
+    return results
+
+
 def linear(results):
     """
     
@@ -175,7 +197,10 @@ filename = "simulations.json"
 
 # results = simulate_games(nplayers, simulations) #, save_file=filename) # for overwriting the file
 results = load_sim_json("simulations.json") # for loading the file
-lin = linear(results)
+
+local_rankings = local_ranking(results)
+
+lin = linear(local_rankings)
 img = heatmap_datashader(lin)
 
 
