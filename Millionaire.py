@@ -30,7 +30,7 @@ def game():
     
 
 # initial_amount = 100
-n_sim = 1000
+n_sim = 100000
 
 sims = np.array([game() for _ in range(n_sim)])
 df_sims = pd.DataFrame(sims)
