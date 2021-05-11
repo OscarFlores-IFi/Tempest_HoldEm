@@ -11,7 +11,8 @@ if the following card (a third one) fits between the 2 previous cards,
 then you earn the amount you have bet. if not, you lose the bet. 
 """
 import numpy as np
-
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def win_lose(cards):
     card1 = cards[0:2].min()
@@ -28,6 +29,27 @@ def game():
     return  win_lose(cards)
     
 
-initial_amount = 100
+# initial_amount = 100
+n_sim = 1000
 
-print([game() for _ in range(50)])
+sims = np.array([game() for _ in range(n_sim)])
+df_sims = pd.DataFrame(sims)
+
+print('Only convenient to bet when expected value is bigger than 0')
+print(df_sims.groupby(0).mean())
+plt.plot(df_sims.groupby(0).mean()) # best fit: y = 0.15x-1
+plt.hlines(0, -1, 11)
+
+
+print('Probabilities of getting every difference: ')
+print(df_sims.iloc[:,0].value_counts())
+df_sims.iloc[:,0].value_counts().plot(kind='bar')
+
+
+
+difs = df_sims.iloc[:,0]
+print('You should bet : {} times out of {} times'.format(difs[difs >= 7].count(),n_sim))
+print('You should not bet : {} times out of {} times'.format(difs[difs < 7].count(),n_sim))
+
+ress = df_sims.iloc[:,1]
+print('Expect to win {} times each of the bets'.format(ress[difs>=7].mean()))
